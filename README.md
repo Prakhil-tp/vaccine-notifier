@@ -1,2 +1,2 @@
 # vaccine-notifier
-It gather information about the available vaccination centers and give us push notification on signal app
+It gathers information about the available vaccination centers and gives us push notification on signal app
