@@ -1,10 +1,10 @@
 const rp = require("request-promise");
 const moment = require("moment");
 const { exec } = require("child_process");
-const config = require("./config.json")
+const config = require("./config.json");
 
 const date = moment().format("DD-MM-YYYY");
-config.url += `?district_id=303&date=${date}`
+config.url += `?district_id=303&date=${date}`;
 
 /**
  * @function makeMessage
@@ -14,8 +14,7 @@ config.url += `?district_id=303&date=${date}`
  * @returns {string} - A message with vaccine center details
  */
 const makeMessage = (center, vaccine, date) => {
-  return (
-    `
+  return `
     Center: ${center.name}
     Address: ${center.address}
     Block: ${center.block_name}
@@ -26,9 +25,8 @@ const makeMessage = (center, vaccine, date) => {
 
     https://selfregistration.cowin.gov.in/
 
-    `
-  )
-}
+    `;
+};
 
 /**
  * @function sendMessage - execute shell script to send the message
@@ -42,7 +40,7 @@ const sendMessage = (message) => {
       console.log(`exec error: ${err}`);
     }
   });
-}
+};
 
 /**
  * IIFE - Fetch data from the CDN and find available centers
@@ -51,19 +49,22 @@ const sendMessage = (message) => {
   const dataStr = await rp(config);
   const { centers } = JSON.parse(dataStr);
   const availableCenters = centers.filter((center) => {
-    return center.sessions.some((session) => session.available_capacity_dose1 > 0 && session.min_age_limit === 18);
+    return center.sessions.some(
+      (session) =>
+        session.available_capacity_dose1 > 0 && session.min_age_limit === 18
+    );
   }); // O(n*m)
 
   if (availableCenters.length > 0) {
-    let message = " VACCINE AVAILABLE";
+    let message = "   VACCINE AVAILABLE";
     message += availableCenters.reduce((acc, value) => {
-      let vaccine = []
+      let vaccine = [];
       let date = [];
-      value.sessions.forEach(session => {
-        if(!vaccine.some(session.vaccine)) vaccine.push(session.vaccine)
-        if(!date.some(session.date)) date.push(session.date)
-      })
-      return acc + makeMessage(value, vaccine.toString(), date.toString())
+      value.sessions.forEach((session) => {
+        if (!vaccine.some(session.vaccine)) vaccine.push(session.vaccine);
+        if (!date.some(session.date)) date.push(session.date);
+      });
+      return acc + makeMessage(value, vaccine.toString(), date.toString());
     }, ""); // O(p*m)
     sendMessage(message);
   }
