@@ -3,8 +3,6 @@ const moment = require("moment");
 const { exec } = require("child_process");
 const config = require("./config.json");
 
-const date = moment().format("DD-MM-YYYY");
-config.url += `?district_id=303&date=${date}`;
 
 /**
  * @function makeMessage
@@ -43,9 +41,12 @@ const sendMessage = (message) => {
 };
 
 /**
- * IIFE - Fetch data from the CDN and find available centers
+ * @function fetchData - Fetch data from the CDN and find available centers
+ * @param {string} districtID
  */
-(async () => {
+const findVaccine =  async (districtID) => {
+  const date = moment().format("DD-MM-YYYY");
+  config.url += `?district_id=${districtID}&date=${date}`;
   const dataStr = await rp(config);
   const { centers } = JSON.parse(dataStr);
   const availableCenters = centers.filter((center) => {
@@ -68,5 +69,8 @@ const sendMessage = (message) => {
     }, ""); // O(p*m)
     sendMessage(message);
   }
-})();
+}
 // O(m*(p+n))
+
+findVaccine("303") // Thrissur
+findVaccine("307") // Ernakulam
