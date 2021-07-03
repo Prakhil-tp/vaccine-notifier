@@ -74,9 +74,12 @@ const findVaccine =  async (districtID) => {
   } catch(err) {
     console.log(err.message)
   }
-}
-// O(m*(p+n))
+} // O(m*(p+n))
 
+
+/**
+ * IIFE - Begin the execution here
+ */
 (async () => {
   await findVaccine("303") // Thrissur
   await findVaccine("307") // Ernakulam
