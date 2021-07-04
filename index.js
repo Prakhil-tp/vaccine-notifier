@@ -1,5 +1,6 @@
 const rp = require("request-promise");
-const moment = require("moment");
+const fs = require("fs")
+const moment = require("moment-timezone");
 const { exec } = require("child_process");
 const config = require("./config.json");
 
@@ -20,9 +21,9 @@ const makeMessage = (center, vaccine, date) => {
     Fee type: ${center.fee_type}
     Vaccine: ${vaccine}
     Date: ${date}
+    Dose: ${center.dose}
 
     https://selfregistration.cowin.gov.in/
-
     `;
 };
 
@@ -46,28 +47,33 @@ const sendMessage = (message) => {
  */
 const findVaccine =  async (districtID) => {
   try {
-    const date = moment().format("DD-MM-YYYY");
-    config.url += `?district_id=${districtID}&date=${date}`;
-    console.log(config)
-    const dataStr = await rp(config);
+    const date = moment().tz("Asia/Kolkata").format("DD-MM-YYYY");
+    options  = {...config}
+    options.url += `?district_id=${districtID}&date=${date}`;
+    const dataStr = await rp(options);
     const { centers } = JSON.parse(dataStr);
     const availableCenters = centers.filter((center) => {
       return center.sessions.some(
-        (session) =>
-          session.available_capacity_dose1 > 0 && session.min_age_limit === 18
+        (session) => {
+          return (session.available_capacity_dose1 > 0 && session.min_age_limit === 18) || (
+            session.available_capacity_dose2 > 0 && session.max_age_limit > 45 
+          )
+        }
       );
     }); // O(n*m)
 
+    // prepare message
     if (availableCenters.length > 0) {
       let message = "   VACCINE AVAILABLE";
       message += availableCenters.reduce((acc, value) => {
-        let vaccine = [];
-        let date = [];
+        let vaccines = [];
+        let dates = [];
         value.sessions.forEach((session) => {
-          if (!vaccine.some(session.vaccine)) vaccine.push(session.vaccine);
-          if (!date.some(session.date)) date.push(session.date);
+          value.dose = session.available_capacity_dose1 > 0 ? 1 : 2
+          if (!vaccines.some(vaccine => vaccine === session.vaccine)) vaccines.push(session.vaccine);
+          if (!dates.some(date => date === session.date)) dates.push(session.date);
         });
-        return acc + makeMessage(value, vaccine.toString(), date.toString());
+        return acc + makeMessage(value, vaccines.toString(), dates.toString());
       }, ""); // O(p*m)
       sendMessage(message);
     }
@@ -78,6 +84,8 @@ const findVaccine =  async (districtID) => {
 // O(m*(p+n))
 
 (async () => {
+  const delay = (time) => new Promise(resolve => setTimeout(() => resolve(), time))
   await findVaccine("303") // Thrissur
+  await delay(1000)
   await findVaccine("307") // Ernakulam
-})
+})()
