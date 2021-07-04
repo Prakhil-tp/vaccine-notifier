@@ -80,9 +80,12 @@ const findVaccine =  async (districtID) => {
   } catch(err) {
     console.log(err.message)
   }
-}
-// O(m*(p+n))
+} // O(m*(p+n))
 
+
+/**
+ * IIFE - Begin the execution here
+ */
 (async () => {
   const delay = (time) => new Promise(resolve => setTimeout(() => resolve(), time))
   await findVaccine("303") // Thrissur
