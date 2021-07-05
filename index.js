@@ -17,7 +17,7 @@ const makeMessage = (center, vaccine, date) => {
     Center: ${center.name}
     Address: ${center.address}
     Block: ${center.block_name}
-    Pincode: ${center.block_name}
+    Pincode: ${center.pincode}
     Fee type: ${center.fee_type}
     Vaccine: ${vaccine}
     Date: ${date}
