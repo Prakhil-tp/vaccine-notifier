@@ -53,13 +53,15 @@ const findVaccine =  async (districtID) => {
     const dataStr = await rp(options);
     const { centers } = JSON.parse(dataStr);
     const availableCenters = centers.filter((center) => {
-      return center.sessions.some(
+      const isAvailable = center.sessions.some(
         (session) => {
           return (session.available_capacity_dose1 > 0 && session.min_age_limit === 18) || (
             session.available_capacity_dose2 > 0 && session.max_age_limit > 45 
           )
         }
       );
+      const isFree = center.fee_type === "Free"
+      return isFree && isAvailable
     }); // O(n*m)
 
     // prepare message
