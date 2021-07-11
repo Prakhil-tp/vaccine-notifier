@@ -25,7 +25,7 @@ The workflow of the script will be initiated by the `cron` job. It triggers the 
 ### Setting up the environment
 
 Make sure you have the `node.js` installed on your system. It is what interpret the actual logic.
-Now, we can set up our code in the machine. for that just clone the repository and install necessary packages: follow the below command.
+Now, we can set up our code in the machine. for that just clone the repository and install necessary packages: follow the below commands.
 
 ``` sh
 git clone https://github.com/Prakhil-tp/vaccine-notifier.git
@@ -63,9 +63,9 @@ Now, let's replace the configured values on the `script.sh` file. You'll be able
 ### Set up the cron job
 
 So far, we configured our code base and signal-cli. The one that pending is regular script invocation.
-Before get out hands dirty, let us test the code is working or not by running the `./run.sh` command on your terminal. If it all looks good, go ahead to set up the cron.
+Before get our hands dirty, let us test the code is working or not by running the `./run.sh` command on your terminal. If it all looks good, go ahead to set up the cron.
 
-`crontab -e` command let you open the crontable, this is where we keep our cron entries.
+`crontab -e` command let you open the crontable, here is where we keep our cron entries.
 
 Let's run our script every 5 minutes: use the following syntax add the entry on the cron table.
 
